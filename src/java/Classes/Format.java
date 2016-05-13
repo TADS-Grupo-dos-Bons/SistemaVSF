@@ -55,4 +55,10 @@ public class Format {
         Date date = new Date(); 
         return dateFormat.format(date); 
     }
+    
+    public String convertDateToString(Date data) { 
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); 
+ 
+        return dateFormat.format(data); 
+    }
 }
