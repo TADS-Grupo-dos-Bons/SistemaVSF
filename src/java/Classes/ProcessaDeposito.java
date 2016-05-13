@@ -111,8 +111,7 @@ public class ProcessaDeposito extends HttpServlet {
                     contaDestino = contaDAO.getByAgenciaConta(nAgencia, nConta);
                     if (conta.sacar(valor)) {
                         contaDestino.depositar(valor);
-                        contaDAO.efetuarSaque(conta, valor);
-                        contaDAO.efetuarDeposito(contaDestino, valor);
+                        contaDAO.efetuarTransferencia(conta, contaDestino, valor);
                         out.println("Transferência executada com sucesso.");
                     } else {
                         out.println("Saldo insuficiente.");

@@ -198,36 +198,25 @@
 									<thead>
 										<tr>
 											<th>
-												Numero
+												Minha Conta
 											</th>                        
 											<th>
+												Conta Destino  
+											</th>
+                                                                                        <th>
 												Valor  
 											</th>
 											<th>
 												Data  
 											</th>
 											<th>
-												Descricao
+												Tipo
 											</th>
 											
 										</tr>                 
 									</thead>
 											
-									<tbody role="alert" aria-live="polite" aria-relevant="all" id="">
-										<tr>
-											<td>001</td>
-											<td>R$20,00</td>
-											<td>00/00/0000</td>
-											<td>compra1</td>
-											
-										</tr>
-										<tr>
-											<td>002</td>
-											<td>R$35,00</td>
-											<td>00/00/0000</td>
-											<td>compra2</td>
-											
-										</tr>
+									<tbody id="tbdTransacao" role="alert" aria-live="polite" aria-relevant="all" id="">
 									</tbody>
 								</table>
 							</div>
@@ -389,6 +378,7 @@
                 function getFormOperacao(idConta){
                     $("#hdnConta").val(idConta);
                     getSaldo(idConta);
+                    getTransacao();
                 }
                  
                 function getSaldo(idConta){
@@ -408,7 +398,7 @@
                           $('#txtSaqueAgencia').val(vet[3]);
                           $('#txtSaqueConta').val(vet[4]);
                           $('#txtSaqueData').val(vet[2]);
-
+                          getTransacao();
                         }
                     });
                 }
@@ -468,6 +458,7 @@
                         success: function(msg){
                             alert(msg);
                             getSaldo($('#hdnConta').val());
+                            getTransacao();
                         }
                     });
                 }
@@ -480,6 +471,7 @@
                             success: function(msg){
                                 alert(msg);
                                 getSaldo($('#hdnConta').val());
+                                getTransacao();
                             }
                     });
                 }
@@ -492,6 +484,7 @@
                         success: function(msg){
                             alert(msg);
                             getSaldo($('#hdnConta').val());
+                            getTransacao();
                         }
                     });
                 }
@@ -516,6 +509,17 @@
                         data: "",
                         success: function(msg){
                             $('#tbConteudoLvConta').html(msg);
+                        }
+                    });
+                }
+                
+                function getTransacao(){
+                    $.ajax({
+                        type: "post",
+                        url: "ListaTransacao", //this is my servlet
+                        data: "idConta="+$('#hdnConta').val(),
+                        success: function(msg){
+                            $('#tbdTransacao').html(msg);
                         }
                     });
                 }

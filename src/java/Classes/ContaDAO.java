@@ -172,9 +172,9 @@ public class ContaDAO {
             transacao.setIdTrancasaoTipo(2);
             transacao.setValor(valor);
             transacao.setData(frm.getDateTime());
-            transacao.setContaDestino(conta.getId());
+            transacao.setIdContaDestino(conta.getId());
             
-            transacaoDAO.insertDeposito(transacao);
+            transacaoDAO.insert(transacao);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally{
@@ -201,9 +201,49 @@ public class ContaDAO {
             transacao.setIdTrancasaoTipo(3);
             transacao.setValor(valor);
             transacao.setData(frm.getDateTime());
-            transacao.setContaDestino(conta.getId());
+            transacao.setIdContaDestino(conta.getId());
             
-            transacaoDAO.insertDeposito(transacao);
+            transacaoDAO.insert(transacao);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally{
+            try{stmt.close();}catch(Exception ex){System.out.println("Erro ao fechar stmt. Ex="+ex.getMessage());};
+            try{con.close();}catch(Exception ex){System.out.println("Erro ao fechar conexão. Ex="+ex.getMessage());};
+        }
+    }
+    
+    public void efetuarTransferencia(Conta conta, Conta contaDestino, Double valor){
+       Connection con=null;
+        PreparedStatement stmt = null;
+        try {
+            con = (Connection) ConnectionFactory.getConnection();
+            stmt = con.prepareStatement(stmtUpdate);
+            
+            stmt.setDouble(1, conta.getSaldo());    
+            stmt.setInt(2, conta.getId());
+            stmt.executeUpdate();
+            
+            stmt.setDouble(1, contaDestino.getSaldo());    
+            stmt.setInt(2, contaDestino.getId());
+            stmt.executeUpdate();
+            
+            Transacao transacao = new Transacao();
+            TransacaoDAO transacaoDAO = new TransacaoDAO();
+            Format frm = new Format();
+            
+            transacao.setIdconta(conta.getId());
+            transacao.setIdTrancasaoTipo(1);
+            transacao.setValor(valor);
+            transacao.setData(frm.getDateTime());
+            transacao.setIdContaDestino(contaDestino.getId());
+            
+            transacaoDAO.insert(transacao);
+            
+            transacao.setIdTrancasaoTipo(4);
+            transacao.setIdconta(contaDestino.getId());
+            transacao.setIdContaDestino(conta.getId());
+            transacaoDAO.insert(transacao);
+            
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally{
