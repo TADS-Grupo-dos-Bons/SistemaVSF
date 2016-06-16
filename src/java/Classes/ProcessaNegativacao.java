@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Junior
  */
-@WebServlet(name = "ListaTransacao", urlPatterns = {"/ListaTransacao"})
-public class ListaTransacao extends HttpServlet {
+@WebServlet(name = "ProcessaNegativacao", urlPatterns = {"/ProcessaNegativacao"})
+public class ProcessaNegativacao extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,33 +38,21 @@ public class ListaTransacao extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            int id = Integer.parseInt((request.getParameter("idConta")));
-            int periodo = Integer.parseInt((request.getParameter("periodo")));
-            
-            TransacaoDAO transacaoDAO = new TransacaoDAO();
-            List<Transacao> lsttransacao = new ArrayList();
-            
-            String sRet = "";
-            
+            Format frm = new Format();
+            String data = frm.removeDays(10);
+
+            CheckEspecialDAO CheckEspecialDAO = new CheckEspecialDAO();
+            List<Cliente> lstCliente = new ArrayList();
+
             try {
-                lsttransacao = transacaoDAO.getLista(id, periodo);
-                
-                for(Transacao transacao : lsttransacao){
-                    sRet += "<tr>n" +
-                                "<td>" + transacao.getMinhaConta() + "</td>\n" +
-                                "<td>" + transacao.getContaDestino() + "</td>\n" +
-                                "<td>" + transacao.getValor() + "</td>\n" +
-                                "<td>" + transacao.getData() + "</td>\n" +
-                                "<td>" + transacao.getNomeTipo() + "</td>\n" +
-                            "</tr>";
+                lstCliente = CheckEspecialDAO.getListaNegativado(data);
+
+                for (Cliente cliente : lstCliente) {
+                    //chamar webservice de insersao de negativado
                 }
-                
             } catch (SQLException ex) {
-                Logger.getLogger(ListaTransacao.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Format.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            out.println(sRet);
         }
     }
 

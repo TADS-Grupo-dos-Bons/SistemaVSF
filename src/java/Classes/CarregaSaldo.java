@@ -40,25 +40,30 @@ public class CarregaSaldo extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             int id = Integer.parseInt((request.getParameter("idConta")));
+            String tipo = request.getParameter("encerrar");
             Conta conta = new Conta();
             ContaDAO contaDAO = new ContaDAO();
-            
-            try {
-                conta = contaDAO.getById(id);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(CarregaSaldo.class.getName()).log(Level.SEVERE, null, ex);
+            if (("encerrar").equals(tipo)) {
+                contaDAO.encerrar(id);
+            } else {
+
+                try {
+                    conta = contaDAO.getById(id);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(CarregaSaldo.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                out.println(conta.getSaldo() + "," + conta.getLimite() + "," + getDateTime() + "," + conta.getAgencia() + "," + conta.getNumero());
             }
-            
-            out.println(conta.getSaldo()+","+conta.getLimite()+","+getDateTime()+","+conta.getAgencia()+","+conta.getNumero());
+
         }
     }
-    
-    private String getDateTime() { 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); 
-        Date date = new Date(); 
-        return dateFormat.format(date); 
-    }
 
+    private String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

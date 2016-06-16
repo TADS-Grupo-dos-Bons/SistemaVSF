@@ -1,5 +1,6 @@
 package Classes;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,12 +9,12 @@ import java.util.logging.Logger;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Junior
  */
 public class Conta {
+
     private int id;
     private String numero;
     private String agencia;
@@ -23,32 +24,73 @@ public class Conta {
     private double limite;
     private String cpfCnpj;
     
-    public void depositar(Double valor){
+
+
+    public void depositar(Double valor) {
         this.saldo += valor;
+        if (this.saldo > 0) {
+            ChequeEspecial chequeespecial = new ChequeEspecial();
+            CheckEspecialDAO CheckEspecialDAO = new CheckEspecialDAO();
+            try {
+                if(CheckEspecialDAO.verificaCheque(this.idcliente, this.id)) {
+                    
+                    try {
+                        CheckEspecialDAO.delete(this.idcliente, this.id);
+                        if(!CheckEspecialDAO.verificaChequeAll(idcliente) ){
+                            int teste = 1;
+                            //chamar webservice para remover cliente somente se seu id nao estiver na tabela cheque_especial
+                        }
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Conta.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                }
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Conta.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
-    
-    public boolean sacar(Double valor){
-        if(valor < this.saldo){
-          this.saldo -= valor;
-          return true;
-        }else{
+
+    public boolean sacar(Double valor) {
+        if (valor <= this.saldo + this.limite) {
+            this.saldo -= valor;
+             if (this.saldo < 0) {
+                ChequeEspecial chequeespecial = new ChequeEspecial();
+                CheckEspecialDAO CheckEspecialDAO = new CheckEspecialDAO();
+
+                try {
+                    if (!CheckEspecialDAO.verificaCheque(this.idcliente, this.id)) {
+                        Format frm = new Format();
+
+                        chequeespecial.setIdcliente(this.idcliente);
+                        chequeespecial.setIdconta(this.id);
+                        chequeespecial.setData(frm.getDateTime());
+                        CheckEspecialDAO.insert(chequeespecial);
+
+                    }
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Conta.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            return true;
+        } else {
             return false;
-        } 
+        }
     }
-    
-    public void calculaLimite(){
+
+    public void calculaLimite() {
         Cliente cliente = new Cliente();
         ClienteDAO clienteDAO = new ClienteDAO();
-        
+
         try {
             cliente = clienteDAO.getById(this.idcliente);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Conta.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if(cliente.getRenda() > 1000){
+
+        if (cliente.getRenda() > 1000) {
             this.limite = (cliente.getRenda() * 1.5);
-        }else{
+        } else {
             this.limite = 0;
         }
     }
@@ -117,6 +159,4 @@ public class Conta {
         this.cpfCnpj = cpfCnpj;
     }
 
-    
-    
 }

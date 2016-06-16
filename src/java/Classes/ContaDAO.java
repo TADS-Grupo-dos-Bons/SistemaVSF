@@ -22,11 +22,12 @@ import java.util.logging.Logger;
  * @author Junior
  */
 public class ContaDAO {
-    String stmtSelect = "select * from conta where idcliente=?";
-    String stmtInsert = "insert into conta(numero,agencia,idcontaTipo,idcliente,saldo,limite,cpfCnpj) values(?,?,?,?,?,?,?);";
+    String stmtSelect = "select * from conta where idcliente=? and ativo = 1";
+    String stmtInsert = "insert into conta(numero,agencia,idcontaTipo,idcliente,saldo,limite,cpfCnpj,ativo) values(?,?,?,?,?,?,?,1);";
     String stmtSelectById = "select * from conta where id=?";
     String stmtUpdate = "update conta set saldo=? where id=?";
-    String stmtSelectByAgenciaConta = "select * from conta where agencia=? and numero=?";
+    String stmtSelectByAgenciaConta = "select * from conta where agencia=? and numero=? and ativo = 1";
+    String stmtEncerrar = "update conta set ativo = 0 where id = ?";
     
     public List<Conta> getLista(int idcliente) throws SQLException{
         Connection con=null;
@@ -93,6 +94,22 @@ public class ContaDAO {
             try{con.close();}catch(Exception ex){System.out.println("Erro ao fechar conexão. Ex="+ex.getMessage());};
         }
   
+    }
+    
+    public void encerrar(int conta){
+       Connection con=null;
+        PreparedStatement stmt = null;
+        try {
+            con = (Connection) ConnectionFactory.getConnection();
+            stmt = con.prepareStatement(stmtEncerrar);   
+            stmt.setInt(1, conta);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally{
+            try{stmt.close();}catch(Exception ex){System.out.println("Erro ao fechar stmt. Ex="+ex.getMessage());};
+            try{con.close();}catch(Exception ex){System.out.println("Erro ao fechar conexão. Ex="+ex.getMessage());};
+        }
     }
     
     public Conta getByAgenciaConta(String nAgencia, String nConta) throws ClassNotFoundException{

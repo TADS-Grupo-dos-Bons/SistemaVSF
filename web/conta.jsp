@@ -180,15 +180,15 @@
 				    	<br>
 
 						<div class='col-md-4 '>
-							<label><input type="radio" name="optradio">Completo</label>
+							<label><input type="radio" name="rblExtrato" value="0">Completo</label>
 						</div>
 
 						<div class='col-md-4'>
-							<label><input type="radio" name="optradio">Ultimos 15 dias</label>
+							<label><input type="radio" name="rblExtrato" value="15">Ultimos 15 dias</label>
 						</div>
 
 						<div class='col-md-4'>
-							<label><input type="radio" name="optradio">Ultimos 30 dias</label>
+							<label><input type="radio" name="rblExtrato" value="30">Ultimos 30 dias</label>
 						</div>
 
 						<div class='row'>
@@ -230,7 +230,7 @@
 								<div class='col-md-8 col-md-offset-3'>
 									<div class="cel1">
 										<label for="cod_analise">Agencia</label>
-										<input id="txtTransferenciaAgencia" class="nome" type="text"/>
+										<input id="txtTransferenciaAgencia" class="nome" type="text" disabled/>
 									</div><br>
 									<div class="cel1">
 										<label for="cod_analise">Conta</label>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -342,6 +342,10 @@
                     $(".contamask").mask("99999");
                     
                     getLista();
+          
+                    $("input[type='radio'][name='rblExtrato']").on('change', function() {
+                        getTransacao($(this).val());
+                     });
                     
                     $("input[type='radio'][name='rblTipo']").on('change', function() {
                         
@@ -378,9 +382,21 @@
                 function getFormOperacao(idConta){
                     $("#hdnConta").val(idConta);
                     getSaldo(idConta);
-                    getTransacao();
+                    getTransacao(0);
                 }
-                 
+                
+                function encerrarConta(idConta){
+                    $.ajax({
+                        type: "post",
+                        url: "CarregaSaldo", //this is my servlet
+                        data: "idConta="+idConta+"&encerrar=encerrar",
+                        success: function(msg){
+                          alert('Conta ecerrada.');
+                          location.reload(true);
+                        }
+                    });
+                }
+                
                 function getSaldo(idConta){
                     $.ajax({
                         type: "post",
@@ -398,7 +414,11 @@
                           $('#txtSaqueAgencia').val(vet[3]);
                           $('#txtSaqueConta').val(vet[4]);
                           $('#txtSaqueData').val(vet[2]);
-                          getTransacao();
+                          
+                          $('#txtTransferenciaAgencia').val(vet[3]);
+                          //$('#txtTransferenciaConta').val(vet[4]);
+                          $('#txtTransferenciaData').val(vet[2]);
+                          getTransacao(0);
                         }
                     });
                 }
@@ -458,7 +478,7 @@
                         success: function(msg){
                             alert(msg);
                             getSaldo($('#hdnConta').val());
-                            getTransacao();
+                            getTransacao(0);
                         }
                     });
                 }
@@ -471,7 +491,7 @@
                             success: function(msg){
                                 alert(msg);
                                 getSaldo($('#hdnConta').val());
-                                getTransacao();
+                                getTransacao(0);
                             }
                     });
                 }
@@ -484,7 +504,7 @@
                         success: function(msg){
                             alert(msg);
                             getSaldo($('#hdnConta').val());
-                            getTransacao();
+                            getTransacao(0);
                         }
                     });
                 }
@@ -513,11 +533,11 @@
                     });
                 }
                 
-                function getTransacao(){
+                function getTransacao(periodo){
                     $.ajax({
                         type: "post",
                         url: "ListaTransacao", //this is my servlet
-                        data: "idConta="+$('#hdnConta').val(),
+                        data: "idConta="+$('#hdnConta').val()+"&periodo="+periodo,
                         success: function(msg){
                             $('#tbdTransacao').html(msg);
                         }

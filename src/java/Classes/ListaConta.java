@@ -56,7 +56,7 @@ public class ListaConta extends HttpServlet {
 "				<td>" + conta.getAgencia() +"</td>\n" +
 "				<td>" + conta.getNumero() + "</td>\n" +
 "				<td>" + conta.getCpfCnpj() + "</td>\n" +
-"				<td><button type=\"button\" class=\"btn btn-warning\" onclick=\"mostramodal1(" + conta.getId() + ")\">Operacoes</button>&nbsp;&nbsp;&nbsp;<button type=\"button\" class=\"btn btn-danger\">Encerrar</button></td>\n" +
+"				<td><button type=\"button\" class=\"btn btn-warning\" onclick=\"mostramodal1(" + conta.getId() + ")\">Operacoes</button>&nbsp;&nbsp;&nbsp;<button type=\"button\" onclick=\"encerrarConta(" + conta.getId() + ")\" class=\"btn btn-danger\">Encerrar</button></td>\n" +
 "			</tr>";
             }
 
