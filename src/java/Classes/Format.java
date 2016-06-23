@@ -106,10 +106,4 @@ public class Format {
         c.add(Calendar.DATE, nDays * -1);
         return dateFormat.format(c.getTime());
     }
-    
-    public String convertDateToString(Date data) { 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); 
- 
-        return dateFormat.format(data); 
-    }
 }
