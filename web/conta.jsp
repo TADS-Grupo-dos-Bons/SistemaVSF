@@ -242,7 +242,7 @@
 									</div><br>
 									<div class="cel1">
 										<label for="cod_analise">Valor</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<input id="txtTransferenciaValor" class="nome" type="text" name="data"/>
+										<input id="txtTransferenciaValor" class="nome valormask" type="text" name="data"/>
 									</div><br>
 								</div>	
 							</div>							
@@ -274,7 +274,7 @@
 									</div><br>
 									<div class="cel1">
 										<label for="cod_analise">Valor</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<input id="txtSaqueValor" class="nome" type="text" name="data"/>
+										<input id="txtSaqueValor" class="nome valormask" type="text" name="data"/>
 									</div><br>
 								</div>								
 							</div>
@@ -305,7 +305,7 @@
 									</div><br>
 									<div class="cel1">
 										<label for="cod_analise">Valor</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<input class="nome" id="txtDepositoValor" type="text" name="data"/>
+										<input class="nome valormask" id="txtDepositoValor" type="text" name="data"/>
 									</div><br>
 								</div>								
 							</div>
@@ -328,10 +328,19 @@
 		$( document ).ready(function() {
                         carregaPagina();
 			
-
+                
 		});
                 
                 function carregaPagina(){
+                    $.ajax({
+                        type: "post",
+                        url: "ProcessaNegativacao", //this is my servlet
+                        data: "",
+                        success: function(msg){
+                          
+                        }
+                    });
+                    
                    $('#myTabs a').click(function (e) {
 			  e.preventDefault()
 			  $(this).tab('show')
@@ -340,7 +349,7 @@
                     $(".cnpjmask").mask("99.999.999/9999-99");
                     $(".agenciamask").mask("9999-9");
                     $(".contamask").mask("99999");
-                    
+                    $(".valormask").mask("9999999999");
                     getLista();
           
                     $("input[type='radio'][name='rblExtrato']").on('change', function() {
@@ -516,7 +525,7 @@
                         data: "tipo="+$("input[type='radio'][name='rblTipo']").val()+"&agencia="+$('#txtNovaAgencia').val()+
                               "&conta="+$('#txtNovaConta').val()+"&cpfCnpj="+$('#txtCpfCnpjNovaConta').val(),
                         success: function(msg){
-                            alert('Conta cadastrada com sucesso.');
+                            alert(msg);
                             location.reload(true);
                         }
                     });

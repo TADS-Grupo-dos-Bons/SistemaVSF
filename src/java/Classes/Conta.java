@@ -3,6 +3,10 @@ package Classes;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -23,8 +27,6 @@ public class Conta {
     private double saldo;
     private double limite;
     private String cpfCnpj;
-    
-
 
     public void depositar(Double valor) {
         this.saldo += valor;
@@ -32,18 +34,25 @@ public class Conta {
             ChequeEspecial chequeespecial = new ChequeEspecial();
             CheckEspecialDAO CheckEspecialDAO = new CheckEspecialDAO();
             try {
-                if(CheckEspecialDAO.verificaCheque(this.idcliente, this.id)) {
-                    
+                if (CheckEspecialDAO.verificaCheque(this.idcliente, this.id)) {
+
                     try {
                         CheckEspecialDAO.delete(this.idcliente, this.id);
-                        if(!CheckEspecialDAO.verificaChequeAll(idcliente) ){
-                            int teste = 1;
+                        if (!CheckEspecialDAO.verificaChequeAll(idcliente)) {
                             //chamar webservice para remover cliente somente se seu id nao estiver na tabela cheque_especial
+                            ClienteDAO ClienteDAO = new ClienteDAO();
+                            Cliente cliente = new Cliente();
+
+                            cliente = ClienteDAO.getById(this.idcliente);
+
+                            Client client = ClientBuilder.newClient();
+                            client.target("http://localhost:8084/SistemaDOR/webresources/inativar").request(MediaType.APPLICATION_JSON).post(Entity.json(cliente));
+
                         }
                     } catch (SQLException ex) {
                         Logger.getLogger(Conta.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    
+
                 }
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Conta.class.getName()).log(Level.SEVERE, null, ex);
@@ -54,7 +63,7 @@ public class Conta {
     public boolean sacar(Double valor) {
         if (valor <= this.saldo + this.limite) {
             this.saldo -= valor;
-             if (this.saldo < 0) {
+            if (this.saldo < 0) {
                 ChequeEspecial chequeespecial = new ChequeEspecial();
                 CheckEspecialDAO CheckEspecialDAO = new CheckEspecialDAO();
 

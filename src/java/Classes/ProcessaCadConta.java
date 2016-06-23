@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -43,24 +48,34 @@ public class ProcessaCadConta extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             HttpSession sessionCli = request.getSession();
             Cliente cliente = (Cliente) sessionCli.getAttribute("Cliente");
-        
-            int tipo = Integer.parseInt(request.getParameter("tipo"));
-            String agencia = request.getParameter("agencia");
-            String numero = request.getParameter("conta");
-            String cpfCnpj = request.getParameter("cpfCnpj");
+
+            Client client = ClientBuilder.newClient();
+            Response resp =  client.target("http://localhost:8084/SistemaDOR/webresources/verifica").request(MediaType.APPLICATION_JSON).post(Entity.json(cliente));
+
+            Cliente clienteDOR = resp.readEntity(Cliente.class);
+            if(clienteDOR.getStatus().equals("I")){
+                int tipo = Integer.parseInt(request.getParameter("tipo"));
+                String agencia = request.getParameter("agencia");
+                String numero = request.getParameter("conta");
+                String cpfCnpj = request.getParameter("cpfCnpj");
+
+                Conta conta = new Conta();
+                ContaDAO contaDAO = new ContaDAO();
+
+                conta.setAgencia(agencia);
+                conta.setNumero(numero);
+                conta.setCpfCnpj(cpfCnpj);
+                conta.setIdcliente(cliente.getId());
+                conta.setIdcontaTipo(tipo);
+                conta.setSaldo(0);
+                conta.calculaLimite();
+
+                contaDAO.insert(conta);
+                out.println("Conta cadastrada com sucesso.");
+            }else{
+                out.println("Voccê está ativo no DOR, e não poderá abrir conta.");
+            }
             
-            Conta conta = new Conta();
-            ContaDAO contaDAO = new ContaDAO();
-            
-            conta.setAgencia(agencia);
-            conta.setNumero(numero);
-            conta.setCpfCnpj(cpfCnpj);
-            conta.setIdcliente(cliente.getId());
-            conta.setIdcontaTipo(tipo);
-            conta.setSaldo(0);
-            conta.calculaLimite();
-            
-            contaDAO.insert(conta);
         }
     }
 

@@ -17,6 +17,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -48,7 +52,9 @@ public class ProcessaNegativacao extends HttpServlet {
                 lstCliente = CheckEspecialDAO.getListaNegativado(data);
 
                 for (Cliente cliente : lstCliente) {
-                    //chamar webservice de insersao de negativado
+                    Client client = ClientBuilder.newClient();
+
+                    client.target("http://localhost:8084/SistemaDOR/webresources/cliente").request(MediaType.APPLICATION_JSON).post(Entity.json(cliente));
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(Format.class.getName()).log(Level.SEVERE, null, ex);
