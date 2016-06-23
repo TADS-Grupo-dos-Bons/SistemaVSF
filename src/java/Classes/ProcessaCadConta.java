@@ -53,7 +53,10 @@ public class ProcessaCadConta extends HttpServlet {
             Response resp =  client.target("http://localhost:8084/SistemaDOR/webresources/verifica").request(MediaType.APPLICATION_JSON).post(Entity.json(cliente));
 
             Cliente clienteDOR = resp.readEntity(Cliente.class);
-            if(clienteDOR.getStatus().equals("I")){
+            if(("A").equals(clienteDOR.getStatus())){
+                
+                out.println("Voccê está ativo no DOR, e não poderá abrir conta.");
+            }else{
                 int tipo = Integer.parseInt(request.getParameter("tipo"));
                 String agencia = request.getParameter("agencia");
                 String numero = request.getParameter("conta");
@@ -72,8 +75,6 @@ public class ProcessaCadConta extends HttpServlet {
 
                 contaDAO.insert(conta);
                 out.println("Conta cadastrada com sucesso.");
-            }else{
-                out.println("Voccê está ativo no DOR, e não poderá abrir conta.");
             }
             
         }
